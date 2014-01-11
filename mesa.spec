@@ -105,7 +105,7 @@ BuildRequires: gettext
 BuildRequires: mesa-private-llvm-devel
 %else
 BuildRequires: llvm-devel >= 3.0
-%if %{?with_opencl}
+%if 0%{?with_opencl}
 BuildRequires: clang-devel >= 3.0
 %endif
 %endif
@@ -123,7 +123,7 @@ BuildRequires: mesa-libGL-devel
 BuildRequires: libvdpau-devel
 %endif
 BuildRequires: zlib-devel
-%if %{?with_opencl}
+%if 0%{?with_opencl}
 BuildRequires: libclc-devel llvm-static opencl-filesystem
 %endif
 
@@ -292,7 +292,7 @@ Group: System Environment/Libraries
 Mesa shared glapi
 
 
-%if %{?with_opencl}
+%if 0%{?with_opencl}
 %package libOpenCL
 Summary: Mesa OpenCL runtime library
 Requires: ocl-icd
