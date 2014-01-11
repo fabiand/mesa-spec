@@ -56,7 +56,7 @@
 Summary: Mesa graphics libraries
 Name: mesa
 Version: 10.0.2
-Release: 1.%{gitdate}%{?dist}
+Release: 2.%{gitdate}%{?dist}
 License: MIT
 Group: System Environment/Libraries
 URL: http://www.mesa3d.org
@@ -80,6 +80,9 @@ Patch20: mesa-9.2-evergreen-big-endian.patch
 
 # backport from upstream to allow cogl use copy_sub_buffer
 Patch30: 0001-swrast-gallium-classic-add-MESA_copy_sub_buffer-supp.patch
+
+# https://bugs.freedesktop.org/show_bug.cgi?id=73512
+Patch99: 0001-opencl-improved-auto-gen-.icd.patch
 
 BuildRequires: pkgconfig autoconf automake libtool
 %if %{with_hardware}
@@ -295,6 +298,7 @@ Mesa shared glapi
 %if 0%{?with_opencl}
 %package libOpenCL
 Summary: Mesa OpenCL runtime library
+Provides: opencl
 Requires: ocl-icd
 Requires: mesa-libgbm = %{version}-%{release}
 
@@ -303,8 +307,8 @@ Mesa OpenCL runtime library.
 
 %package libOpenCL-devel
 Summary: Mesa OpenCL development package
-Requires: mesa-libOpenCL%{?_isa} %{version}-%{release}
 Provides: opencl-devel
+Requires: mesa-libOpenCL%{?_isa} = %{version}-%{release}
 
 %description libOpenCL-devel
 Mesa OpenCL development package.
@@ -331,6 +335,8 @@ grep -q ^/ src/gallium/auxiliary/vl/vl_decoder.c && exit 1
 %patch20 -p1 -b .egbe
 
 %patch30 -p1 -b .copy_sub_buffer
+
+%patch99 -p1 -b .icd
 
 %if 0%{with_private_llvm}
 sed -i 's/llvm-config/mesa-private-llvm-config-%{__isa_bits}/g' configure.ac
@@ -376,7 +382,7 @@ export CXXFLAGS="$RPM_OPT_FLAGS %{?with_opencl:-frtti -fexceptions} %{!?with_ope
     --with-egl-platforms=x11,drm%{?with_wayland:,wayland} \
     --enable-shared-glapi \
     --enable-gbm \
-    %{?with_opencl:--enable-opencl --enable-opencl-icd --with-clang-libdir=/usr/lib} %{!?with_opencl:--disable-opencl} \
+    %{?with_opencl:--enable-opencl --enable-opencl-icd --with-clang-libdir=%{_prefix}/lib} %{!?with_opencl:--disable-opencl} \
     --enable-glx-tls \
     --enable-texture-float=yes \
     %{?with_llvm:--enable-gallium-llvm} \
@@ -637,6 +643,9 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %changelog
+* Sun Jan 12 2014 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 10.0.2-2.20140110
+- Enable OpenCL
+
 * Fri Jan 10 2014 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 10.0.2-1.20140110
 - 10.0.2 upstream release
 
