@@ -39,6 +39,7 @@
 %ifarch %{ix86} x86_64
 %define platform_drivers ,i915,i965
 %define with_vmware 1
+%define with_opencl 1
 %endif
 %ifarch ppc
 %define platform_drivers ,swrast
@@ -104,6 +105,9 @@ BuildRequires: gettext
 BuildRequires: mesa-private-llvm-devel
 %else
 BuildRequires: llvm-devel >= 3.0
+%if %{?with_opencl}
+BuildRequires: clang-devel >= 3.0
+%endif
 %endif
 %endif
 BuildRequires: elfutils-libelf-devel
@@ -119,6 +123,9 @@ BuildRequires: mesa-libGL-devel
 BuildRequires: libvdpau-devel
 %endif
 BuildRequires: zlib-devel
+%if %{?with_opencl}
+BuildRequires: libclc-devel llvm-static opencl-filesystem
+%endif
 
 %description
 Mesa
@@ -284,6 +291,25 @@ Group: System Environment/Libraries
 %description libglapi
 Mesa shared glapi
 
+
+%if %{?with_opencl}
+%package libOpenCL
+Summary: Mesa OpenCL runtime library
+Requires: ocl-icd
+Provides: opencl
+
+%description libOpenCL
+Mesa OpenCL runtime library.
+
+%package libOpenCL-devel
+Summary: Mesa OpenCL development package
+Requires: mesa-libOpenCL%{?_isa} %{version}-%{release}
+Provides: opencl-devel
+
+%description libOpenCL-devel
+Mesa OpenCL development package.
+%endif
+
 %prep
 #setup -q -n Mesa-%{version}%{?snapshot}
 %setup -q -n mesa-%{gitdate}
@@ -330,7 +356,7 @@ export CFLAGS="$RPM_OPT_FLAGS"
 #
 # We do say 'catch' in the clover and d3d1x state trackers, but we're not
 # building those yet.
-export CXXFLAGS="$RPM_OPT_FLAGS -fno-rtti -fno-exceptions"
+export CXXFLAGS="$RPM_OPT_FLAGS %{?with_opencl:-frtti -fexceptions} %{!?with_opencl:-fno-rtti -fno-exceptions}"
 %ifarch %{ix86}
 # i do not have words for how much the assembly dispatch code infuriates me
 %define asm_flags --disable-asm
@@ -350,7 +376,7 @@ export CXXFLAGS="$RPM_OPT_FLAGS -fno-rtti -fno-exceptions"
     --with-egl-platforms=x11,drm%{?with_wayland:,wayland} \
     --enable-shared-glapi \
     --enable-gbm \
-    --disable-opencl \
+    %{?with_opencl:--enable-opencl --enable-opencl-icd --with-clang-libdir=/usr/lib} %{!?with_opencl:--disable-opencl} \
     --enable-glx-tls \
     --enable-texture-float=yes \
     %{?with_llvm:--enable-gallium-llvm} \
@@ -423,6 +449,10 @@ rm -rf $RPM_BUILD_ROOT
 %if 0%{?with_vmware}
 %post libxatracker -p /sbin/ldconfig
 %postun libxatracker -p /sbin/ldconfig
+%endif
+%if %{?with_opencl}
+%post libOpenCL -p /sbin/ldconfig
+%postun libOpenCL -p /sbin/ldconfig
 %endif
 
 %files libGL
@@ -594,6 +624,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/xa_context.h
 %{_libdir}/pkgconfig/xatracker.pc
 %endif
+%endif
+
+%if %{?with_opencl}
+%files libOpenCL
+%{_libdir}/libMesaOpenCL.so.*
+%{_sysconfdir}/OpenCL/vendors/mesa.icd
+
+%files libOpenCL-devel
+%{_libdir}/libMesaOpenCL.so
+%{_libdir}/gallium-pipe/
 %endif
 
 %changelog
