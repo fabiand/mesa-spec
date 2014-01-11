@@ -296,7 +296,7 @@ Mesa shared glapi
 %package libOpenCL
 Summary: Mesa OpenCL runtime library
 Requires: ocl-icd
-Provides: opencl
+Requires: mesa-libgbm = %{version}-%{release}
 
 %description libOpenCL
 Mesa OpenCL runtime library.
@@ -450,7 +450,7 @@ rm -rf $RPM_BUILD_ROOT
 %post libxatracker -p /sbin/ldconfig
 %postun libxatracker -p /sbin/ldconfig
 %endif
-%if %{?with_opencl}
+%if 0%{?with_opencl}
 %post libOpenCL -p /sbin/ldconfig
 %postun libOpenCL -p /sbin/ldconfig
 %endif
@@ -626,14 +626,14 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %endif
 
-%if %{?with_opencl}
+%if 0%{?with_opencl}
 %files libOpenCL
 %{_libdir}/libMesaOpenCL.so.*
+%{_libdir}/gallium-pipe/
 %{_sysconfdir}/OpenCL/vendors/mesa.icd
 
 %files libOpenCL-devel
 %{_libdir}/libMesaOpenCL.so
-%{_libdir}/gallium-pipe/
 %endif
 
 %changelog
