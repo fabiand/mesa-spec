@@ -299,6 +299,7 @@ Mesa shared glapi
 %package libOpenCL
 Summary: Mesa OpenCL runtime library
 Requires: ocl-icd
+Requires: libclc
 Requires: mesa-libgbm = %{version}-%{release}
 
 %description libOpenCL
