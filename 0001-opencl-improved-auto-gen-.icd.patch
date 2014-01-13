@@ -1,10 +1,12 @@
-From 5b2bf87f1238e44150492a39f5db0ae90d59459b Mon Sep 17 00:00:00 2001
+From 91796da9c00c0756b90b9e09d404a5357ff32ec6 Mon Sep 17 00:00:00 2001
 From: Igor Gnatenko <i.gnatenko.brain@gmail.com>
 Date: Sun, 12 Jan 2014 02:09:16 +0400
 Subject: [PATCH] opencl: improved auto-gen .icd
 
 v2: Use @OPENCL_VERSION@:0 for library
     replace /etc with @sysconfdir@ macros
+
+v3: Drop libdir from icd, because libMesaOpenCL isn't private
 
 Reported-by: Fabian Deutsch <fabian.deutsch@gmx.de>
 Reference: https://bugs.freedesktop.org/show_bug.cgi?id=73512
@@ -70,11 +72,11 @@ index 6a6a870..0000000
 -libMesaOpenCL.so
 diff --git a/src/gallium/targets/opencl/mesa.icd.in b/src/gallium/targets/opencl/mesa.icd.in
 new file mode 100644
-index 0000000..a0b6489
+index 0000000..1b77b4e
 --- /dev/null
 +++ b/src/gallium/targets/opencl/mesa.icd.in
 @@ -0,0 +1 @@
-+@libdir@/lib@OPENCL_LIBNAME@.so.@OPENCL_VERSION@
++lib@OPENCL_LIBNAME@.so.@OPENCL_VERSION@
 -- 
 1.8.4.2
 
