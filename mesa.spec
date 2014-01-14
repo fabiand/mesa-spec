@@ -82,7 +82,7 @@ Patch20: mesa-9.2-evergreen-big-endian.patch
 Patch30: 0001-swrast-gallium-classic-add-MESA_copy_sub_buffer-supp.patch
 
 # https://bugs.freedesktop.org/show_bug.cgi?id=73512
-Patch99: 0001-opencl-improved-auto-gen-.icd.patch
+Patch99: 0001-opencl-use-versioned-.so-in-mesa.icd.patch
 
 BuildRequires: pkgconfig autoconf automake libtool
 %if %{with_hardware}
